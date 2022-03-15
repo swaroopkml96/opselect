@@ -9,18 +9,23 @@ def extract_file(source, destination):
     tf.extractall(destination)
 
 def extract_dataset(force=False):
-    if not force and os.path.exists(
-        "data/processed/cifar-10/extracted/cifar-10-batches-py"
-    ):
+    data_file_path = os.path.join(
+        "data", "original", "cifar-10", "cifar-10-python.tar.gz"
+    )
+    extract_location = os.path.join(
+        "data", "processed", "cifar-10", "extracted"
+    )
+    extracted_folder_path = os.path.join(
+        extract_location, "cifar-10-batches-py"
+    )
+
+    if not force and os.path.exists(extracted_folder_path):
         print("Extracted copy already exists on disk. Not Extracting.\n"
               "Pass the flag --force to remove existing files and re-extract")
     else:
         if force:
-            shutil.rmtree("data/processed/cifar-10/extracted/cifar-10-batches-py")
-        extract_file(
-            "data/original/cifar-10/cifar-10-python.tar.gz",
-            "data/processed/cifar-10/extracted"
-        )
+            shutil.rmtree(extracted_folder_path)
+        extract_file(data_file_path, extract_location)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Extract the CIFAR-10 dataset')
