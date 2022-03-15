@@ -7,17 +7,18 @@ def download_url(url, destination):
     wget.download(url, destination)
 
 def download_dataset(force=False):
-    if not force and os.path.exists(
-        "data/original/cifar-10/cifar-10-python.tar.gz"
-    ):
+    data_folder_path = os.path.join("data", "original", "cifar-10")
+    data_file_path = os.path.join(data_folder_path, "cifar-10-python.tar.gz")
+
+    if not force and os.path.exists(data_file_path):
         print("Dataset already exists on disk. Not downloading.\n"
               "Pass the flag --force to remove existing file and re-download")
     else:
         if force:
-            os.remove("data/original/cifar-10/cifar-10-python.tar.gz")
+            os.remove(data_file_path)
         download_url(
             "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz",
-            "data/original/cifar-10/"
+            data_folder_path
         )
 
 if __name__ == '__main__':
