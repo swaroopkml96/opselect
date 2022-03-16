@@ -1,0 +1,5 @@
+general:
+  random_seed: 42
+
+data:
+  val_ratio: 0.1
