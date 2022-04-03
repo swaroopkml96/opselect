@@ -20,7 +20,7 @@ def train():
             std=(0.2718, 0.2683, 0.2790)
         )
     ])
-    dl = get_dataloader("data/csvs/train.csv", tfms, 64, True, 20)
+    dl = get_dataloader("data/csvs/train.csv", tfms, 64, False, 20)
 
     # Model
     # TODO: Move tmodel loading into a different function, parametrize with config
