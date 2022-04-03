@@ -35,7 +35,7 @@ class BasicBlock(nn.Module):
         return nn.ReLU(inplace=True)(self.residual_function(x) + self.shortcut(x))
 
 
-class ResNet(nn.Module):
+class Model(nn.Module):
 
     def __init__(self):
         super().__init__()
