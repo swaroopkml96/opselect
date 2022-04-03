@@ -39,8 +39,6 @@ def generate_csv():
     
     valid_df.to_csv(os.path.join(output_path, f"valid.csv"), index=None)
     train_df.to_csv(os.path.join(output_path, f"train.csv"), index=None)
-    
-    
         
 
 if __name__ == '__main__':
