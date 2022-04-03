@@ -1,6 +1,5 @@
 import os
 import argparse
-from random import shuffle
 
 import numpy as np
 import pandas as pd
