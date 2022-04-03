@@ -58,7 +58,7 @@ if __name__ == '__main__':
     print(f"Std.:\n{imgs.std(axis=(0,2,3))}")
     
     # Dataloader
-    dl = get_dataloader("data/csvs/valid.csv", tfms, 64, True, 20)
+    dl = get_dataloader("data/csvs/valid.csv", tfms, 64, False, 20)
     print(dl)
 
 
