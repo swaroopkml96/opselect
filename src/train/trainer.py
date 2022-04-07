@@ -2,12 +2,15 @@ from tqdm import tqdm as tqdm
 
 import numpy as np
 import torch
+import torch.nn as nn
 
 class Trainer:
-    def __init__(self, train_dl, valid_dl, model):
+    def __init__(self, train_dl, valid_dl, model, optimizer, device):
         self.train_dl = train_dl
         self.valid_dl = valid_dl
         self.model = model
+        self.optimizer = optimizer
+        self.device = device
 
     def _run_epoch(self, epoch, split):
         model = self.model
@@ -28,7 +31,8 @@ class Trainer:
 
             # forward the model
             with torch.set_grad_enabled(is_train):
-                _, loss = model(x, y, cy)
+                out = model(x)
+                loss = nn.BCEWithLogitsLoss()(out, y)
                 # collapse all losses if they are scattered on multiple gpus
                 loss = loss.mean()
                 losses.append(loss.item())
@@ -38,12 +42,12 @@ class Trainer:
                 model.zero_grad()
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(
-                    model.parameters(), 1)
+                    model.parameters(), 1.0)
                 optimizer.step()
 
                 # report progress
                 pbar.set_description(
-                    f"epoch {epoch+1} iter {it}: train loss {loss.item():.5f}. lr {lr:e}")
+                    f"epoch {epoch+1} iter {it}: train loss {loss.item():.5f}")
 
         if not is_train:
             valid_loss = float(np.mean(losses))
@@ -55,11 +59,11 @@ class Trainer:
         best_loss = float('inf')
         for epoch in range(10):
             self._run_epoch(epoch, 'train')
-            if self.dataloader_valid is not None:
+            if self.valid_dl is not None:
                 valid_loss = self._run_epoch(epoch, 'valid')
 
             # supports early stopping based on the validation loss, or just save
             # always if no validation set is provided
-            good_model = self.dataloader_valid is None or valid_loss < best_loss
-            if self.args.save_path is not None and good_model:
-                best_loss = valid_loss
+            good_model = self.valid_dl is None or valid_loss < best_loss
+            # if self.args.save_path is not None and good_model:
+            #     best_loss = valid_loss
