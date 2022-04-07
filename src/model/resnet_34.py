@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 class BasicBlock(nn.Module):
@@ -77,3 +78,8 @@ class Model(nn.Module):
         output = self.fc(output)
 
         return output
+    
+    def configure_optimizers(self):
+        optimizer = torch.optim.AdamW(
+            self.parameters(), lr=0.01, betas=[0.9, 0.999])
+        return optimizer
