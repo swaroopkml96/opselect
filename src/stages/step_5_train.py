@@ -1,15 +1,15 @@
 import argparse
 
+import torch
 import torchvision.transforms as transforms
 
-# TODO: Should import cifar_100 or other dataset and resnet_34 or other model based on config
 from src.dataset.cifar_100 import get_dataloader
 from src.model.resnet_34 import Model
+from src.train.trainer import Trainer
 
 
 def train():
     # Dataset
-    # TODO: Move tfms and get_dl into a different function, parametrize with config
     tfms = transforms.Compose([
         transforms.RandomHorizontalFlip(p=0.5),
         transforms.RandomVerticalFlip(p=0.5),
@@ -23,10 +23,17 @@ def train():
     dl = get_dataloader("data/csvs/train.csv", tfms, 64, False, 20)
 
     # Model
-    # TODO: Move tmodel loading into a different function, parametrize with config
-    model = Model()
+    model = Model().to('cuda:0')
+
+    # Optimizer
+    optimizer = torch.optim.AdamW(
+        model.parameters(), lr=0.01, betas=[0.9, 0.999])
     
-    # TODO: Trainer
+    # Trainer
+    trainer = Trainer(dl, dl, model, optimizer)
+
+    # Fit
+    trainer.fit()
 
 
 if __name__ == '__main__':
