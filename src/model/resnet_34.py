@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 class BasicBlock(nn.Module):
@@ -38,11 +37,10 @@ class BasicBlock(nn.Module):
 
 class Model(nn.Module):
 
-    def __init__(self):
+    def __init__(self, num_classes):
         super().__init__()
         block = BasicBlock
         num_block = [3, 4, 6, 3]
-        num_classes = 100
 
         self.in_channels = 64
 
@@ -78,8 +76,3 @@ class Model(nn.Module):
         output = self.fc(output)
 
         return output
-    
-    def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(
-            self.parameters(), lr=0.01, betas=[0.9, 0.999])
-        return optimizer
