@@ -1,4 +1,5 @@
 import os
+import shutil
 import pickle
 import argparse
 from tqdm import tqdm as tqdm
@@ -12,17 +13,24 @@ def load_batch(batch_path):
         batch = pickle.load(fo, encoding='bytes')
     return batch
 
-def save_batch_images(batch_path, save_path, pbar):
+def save_batch_images(batch_path, save_path, classes, pbar):
     batch = load_batch(batch_path)
     for i in range(len(batch[b'data'])):
         img = batch[b'data'][i]
         fname = batch[b'filenames'][i]
+        label = classes[batch[b'labels'][i]]
         img_red = np.reshape(img[:32*32], [32, 32])
         img_green = np.reshape(img[32*32:2*32*32], [32, 32])
         img_blue = np.reshape(img[2*32*32:], [32, 32])
         
         img_rgb = np.dstack([img_red, img_green, img_blue])
-        plt.imsave(os.path.join(save_path, fname.decode('ascii')), img_rgb)
+        plt.imsave(
+            os.path.join(
+                save_path, 
+                f"{label.decode('ascii')}_{fname.decode('ascii')}"
+            ),
+            img_rgb
+        )
         pbar.update(1)
 
 
@@ -32,6 +40,17 @@ def transform_dataset(force=False):
         print("RGB images already exist on disk. Not converting.\n"
               "Pass the flag --force to convert while replacing existing files.")
     else:
+        if force:
+            shutil.rmtree(rgb_path)
+
+        # Meta data
+        batch_path = os.path.join(
+            "data", "processed", "cifar-10", "extracted", "cifar-10-batches-py", 
+            f"batches.meta"
+        )
+        metadata = load_batch(batch_path)
+        classes = metadata[b"label_names"]
+
         # Train
         save_path = os.path.join(rgb_path, "train")
         pbar = tqdm(total=50_000, desc="Converting [train]")
@@ -41,7 +60,7 @@ def transform_dataset(force=False):
                 "data", "processed", "cifar-10", "extracted", "cifar-10-batches-py", 
                 f"data_batch_{batch_id}"
             )
-            save_batch_images(batch_path, save_path, pbar)
+            save_batch_images(batch_path, save_path, classes, pbar)
 
         # Test
         save_path = os.path.join(rgb_path, "test")
@@ -52,7 +71,7 @@ def transform_dataset(force=False):
             "data", "processed", "cifar-10", "extracted", "cifar-10-batches-py", 
             "test_batch"
         )
-        save_batch_images(batch_path, save_path, pbar)
+        save_batch_images(batch_path, save_path, classes, pbar)
         
         
         
